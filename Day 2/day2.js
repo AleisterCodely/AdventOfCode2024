@@ -16,39 +16,67 @@ reader.on('line', function(line) {
 
 //Once we've finished reading loop through the array, separate into 2 lists
 reader.on('close', function(){
-  //Add all levels to a levels array
   let levelsArray = [];
+
+  //Do magic for part 1
   let total = 0;
   for(let i=0;i<inputArray.length;i++){
     levelsArray = inputArray[i].split(" ");
-    //Then check if the level is safe and update total
-    let isDecreasing = false;
-    let isIncreasing = false;
     
-    for(let j=0;j<levelsArray.length-1;j++){
-      const current = Number(levelsArray[j]);
-      const next = Number(levelsArray[j+1]);
+    if(checkSafety(levelsArray)){
+      total++
+    }
+  }
+  console.log("Part 1 answer: " + total);
 
-      if(Math.abs(current-next)>=4){
+  //Then part 2
+  total = 0;
+  for(let i=0;i<inputArray.length;i++){
+    levelsArray = inputArray[i].split(" ");
+    let dampenerTriggered = false;
+
+    for (let j = 0; j < levelsArray.length; j++) {
+      const singleLevel = levelsArray.slice(0, j).concat(levelsArray.slice(j + 1));
+      if (checkSafety(singleLevel)) {
+        dampenerTriggered = true;
         break;
       }
-      if(current!==next){
-        if(j===0){
-          current > next ? isDecreasing = true : isIncreasing = true;
-        }
-      } else {
-        break;
+    }
+
+    if (dampenerTriggered) {
+      total++;
+    }
+  }
+
+  console.log("Part 2 answer: " + total)
+});
+
+const checkSafety = (levelsArray) => {
+  let isDecreasing = false;
+  let isIncreasing = false;
+
+  for(let j=0;j<levelsArray.length-1;j++){
+    const current = Number(levelsArray[j]);
+    const next = Number(levelsArray[j+1]);
+
+    if(Math.abs(current-next)>=4){
+      break;
+    }
+    if(current!==next){
+      if(j===0){
+        current > next ? isDecreasing = true : isIncreasing = true;
       }
-      if(isIncreasing && current > next){
-        break;
-      } else if(isDecreasing && current < next){
-        break;
-      } else {
-        if(j+1>=levelsArray.length-1){
-          total++
-        }
+    } else {
+      break;
+    }
+    if(isIncreasing && current > next){
+      break;
+    } else if(isDecreasing && current < next){
+      break;
+    } else {
+      if(j+1>=levelsArray.length-1){
+        return true;
       }
     }
   }
-  console.log(total);
-});
+}
